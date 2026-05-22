@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: jaffle_shop
+    database: wix-user-segmentation
+    schema: jaffle_shop
+    tables:
+      - name: jaffle_customers
+        description: Raw customer records from the source system.
+
+      - name: jaffle_orders
+        description: Raw order transactions.
+
+      - name: jaffle_items
+        description: Individual line items within each order.
+
+      - name: jaffle_products
+        description: Product catalogue.
+
+      - name: jaffle_stores
+        description: Store locations.
+
+      - name: jaffle_supplies
+        description: Supply and inventory records.
