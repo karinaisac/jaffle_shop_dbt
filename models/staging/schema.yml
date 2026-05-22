@@ -1,0 +1,135 @@
+version: 2
+
+models:
+  - name: stg_jaffle_customers
+    description: "Staged customer data, cleaned and renamed from the raw source."
+    columns:
+      - name: customer_id
+        description: "The unique identifier for each customer."
+        tests:
+          - not_null
+          - unique
+      - name: customer_name
+        description: "The name of the customer."
+        tests:
+          - not_null
+
+  - name: stg_jaffle_items
+    description: "Staged line item data, representing individual items within each order."
+    columns:
+      - name: item_id
+        description: "The unique identifier for each line item."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "The order this item belongs to."
+        tests:
+          - not_null
+      - name: item_sku
+        description: "The SKU of the product ordered."
+        tests:
+          - not_null
+
+  - name: stg_jaffle_orders
+    description: "Staged order data, cleaned and renamed from the raw source."
+    columns:
+      - name: order_id
+        description: "The unique identifier for each order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "The customer who placed the order."
+        tests:
+          - not_null
+      - name: ordered_at
+        description: "The timestamp of when the order was placed."
+        tests:
+          - not_null
+      - name: store_id
+        description: "The store the order was placed at."
+        tests:
+          - not_null
+      - name: subtotal
+        description: "The order total before tax."
+        tests:
+          - not_null
+      - name: tax_paid
+        description: "The tax amount applied to the order."
+        tests:
+          - not_null
+      - name: order_total
+        description: "The total order value including tax."
+        tests:
+          - not_null
+
+  - name: stg_jaffle_products
+    description: "Staged product catalogue data."
+    columns:
+      - name: product_sku
+        description: "The unique identifier for each product."
+        tests:
+          - not_null
+          - unique
+      - name: product_name
+        description: "The name of the product."
+        tests:
+          - not_null
+      - name: product_type
+        description: "The category or type of the product."
+        tests:
+          - not_null
+      - name: product_price
+        description: "The price of the product."
+        tests:
+          - not_null
+      - name: product_description
+        description: "A description of the product."
+        tests:
+          - not_null
+
+  - name: stg_jaffle_stores
+    description: "Staged store location data."
+    columns:
+      - name: store_id
+        description: "The unique identifier for each store."
+        tests:
+          - not_null
+          - unique
+      - name: store_name
+        description: "The name of the store."
+        tests:
+          - not_null
+      - name: store_opened_at
+        description: "The date the store opened."
+        tests:
+          - not_null
+      - name: store_tax_rate
+        description: "The tax rate applicable to the store's location."
+        tests:
+          - not_null
+
+  - name: stg_jaffle_supplies
+    description: "Staged supply and inventory data."
+    columns:
+      - name: supply_id
+        description: "The unique identifier for each supply item."
+        tests:
+          - not_null
+      - name: supply_name
+        description: "The name of the supply item."
+        tests:
+          - not_null
+      - name: supply_cost
+        description: "The cost of the supply item."
+        tests:
+          - not_null
+      - name: perishable
+        description: "Boolean flag indicating whether the supply item is perishable."
+        tests:
+          - not_null
+      - name: supply_sku
+        description: "The SKU linking the supply to its associated product."
+        tests:
+          - not_null

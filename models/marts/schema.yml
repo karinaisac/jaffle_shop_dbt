@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "A dimension table of the customer data, including their id, name, and unique key."
+    columns:
+      - name: customer_id
+        description: "Numeric id of the customer."
+        tests:
+          - not_null
+      - name: customer_name
+        description: "Name of the customer."
+        tests:
+          - not_null
+      - name: customer_key
+        description: "The surrogate key that is generated as a unique identifier for each customer from their id and name."
+        tests:
+          - not_null
+          - unique 
+
+  - name: fct_orders
+    description: "Core fact table for all orders."
+    columns:
+      - name: order_id
+        description: "The unique id for each order."
+        tests:
+          - not_null
+          - unique 
+      - name: customer_id
+        description: "The unique id for each customer."
+        tests:
+          - not_null
+      - name: store_id
+        description: "The unique id number of the store."
+        tests: 
+          - not_null
+      - name: ordered_at
+        description: "The timestamp of the order date and time."
+        tests:
+          - not_null 
+      - name: subtotal
+        description: "The order total without tax."
+        tests:
+          - not_null
+      - name: tax_paid
+        description: "The tax sum applicable to the order."
+        tests:
+          - not_null
+      - name: order_total
+        description: "The total of the order, including tax and the order total."
+        tests:
+          - not_null
