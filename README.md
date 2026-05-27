@@ -1,9 +1,39 @@
 # jaffle_shop_dbt
 
-For my project, I chose a public dataset that is made available by dbt labs itself called the Jaffle Shop dataset. The dataset is a synthetic dataset that is comprised of data from a chain of jaffle shops, their locations, supplies, products, orders, and customers. I chose this dataset as a simple option to model slowly changing dimensions and to write in an incremental model.
+## Overview
+A dbt project built on the public [Jaffle Shop dataset](https://github.com/dbt-labs/jaffle_shop) provided by dbt Labs. The dataset is synthetic and represents a chain of restaurants (jaffle shops), modelling their locations, supplies, products, orders, and customers. It was chosen as a clean and approachable base for demonstrating slowly changing dimensions and incremental models.
 
-In my project, the data was loaded into BigQuery, then connected to dbt. In dbt, the data was cleaned to harmonize column names, remove a couple unnecessary data points, and deduplicate the data. The dataset was not particularly complex, so there are only staging and mart models. 
+## Stack
+- **Warehouse:** Google BigQuery
+- **Transformation:** dbt Cloud
+- **Source data:** dbt Labs Jaffle Shop (loaded directly into BigQuery)
 
-A slowly changing dimension model was written on top of the dim_customers model to ensure that any changes in customer names over time were captured and logged with their corresponding customer key. The customer key was generated as a surrogate key to ensure each customer (or the same customer with a slightly different name) had a unique identifier. In this dataset, the data is not particularly complex, so only the customer name is something that could change over time, which would likely not be true for more complex datasets that would have more variables prone to changing over time.
+## Model Structure
 
-The fct orders table had an incremental model written into it to ensure the performance of the model when new data came in. The variable chosen as the one to look at when running the incremental model was the order time, as this variable is the best one to signal the freshness of the data.
+```
+jaffle_shop_dbt/
+└── models/
+    ├── staging/                      -- Rename cols, cast types, deduplicate
+    └── marts/
+        ├── dim_customers_scd.sql     -- Type 2 SCD, surrogate key on customer name
+        └── fct_orders.sql            -- Incremental model, filtered on order_time
+```
+
+**Data flow:** Sources → Staging → Marts
+
+| Model | Type | Key detail |
+|---|---|---|
+| `stg_*` | View | Cleans and harmonises raw source tables |
+| `dim_customers_scd` | Table | Type 2 SCD tracking customer name changes over time |
+| `fct_orders` | Incremental | Appends new rows using `order_time` as the filter predicate |
+
+## Data Modeling Approach
+
+### Staging Layer
+Raw source tables are cleaned in the staging layer to harmonise column names, cast data types, and remove duplicates. The source data is not complex, so no intermediate layer was needed between staging and marts.
+
+### Slowly Changing Dimension — `dim_customers_scd`
+A **Type 2 SCD** is applied to the customer dimension. Because customer names can change over time, each version of a customer record is preserved with its own surrogate key. This allows downstream models and reports to join on the correct customer name as of any point in time. In a richer dataset, additional attributes prone to change (address, tier, etc.) would also be tracked here.
+
+### Incremental Model — `fct_orders`
+The orders fact table uses dbt's incremental materialisation strategy. The `order_time` column serves as the filter predicate: on each run, only rows with an `order_time` newer than the maximum already loaded are processed. This keeps run times short as the dataset grows and avoids reprocessing the full history on every execution. Use `dbt run --full-refresh` to rebuild the table from scratch if needed.
